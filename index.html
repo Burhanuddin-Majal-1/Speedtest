@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<meta name="description" content="Measure your internet download speed, upload speed, ping and jitter with Majal Speedtest.">
+<title>Majal Speedtest — Internet Performance</title>
+<style>
+:root{color-scheme:dark;--bg:#080b14;--panel:rgba(18,25,43,.78);--line:rgba(148,163,184,.15);--muted:#93a4bf;--white:#f4f7ff;--cyan:#42d7ff;--purple:#9b8cff;--green:#50e3ad}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#18335a 0,transparent 48%),radial-gradient(circle at 90% 70%,#241b50 0,transparent 28%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--white);padding:28px 18px 40px}
+main{max-width:980px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:10px 0 34px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.12em}.logo{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#42d7ff,#8170ff);color:#07101c;font-size:21px;box-shadow:0 8px 30px #42d7ff35}.status{font-size:11px;color:var(--green);border:1px solid #50e3ad50;border-radius:99px;padding:7px 11px;letter-spacing:.1em}
+h1{text-align:center;font-size:clamp(28px,5vw,48px);letter-spacing:-.045em;margin:0}.sub{text-align:center;color:var(--muted);margin:10px 0 30px;font-size:14px}
+.glass{background:linear-gradient(145deg,rgba(26,37,61,.88),rgba(12,17,31,.84));border:1px solid var(--line);border-radius:26px;box-shadow:0 24px 80px #0006,inset 0 1px #ffffff0b;backdrop-filter:blur(18px)}
+.test-card{padding:30px 24px 25px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}.meter-wrap{display:grid;place-items:center}.meter{width:min(100%,310px);aspect-ratio:1;border-radius:50%;padding:13px;background:conic-gradient(from 220deg,#42d7ff 0deg,#897aff 100deg,#24334d 100deg 280deg,transparent 280deg);position:relative;filter:drop-shadow(0 0 24px #42d7ff28)}.meter:before{content:"";position:absolute;inset:13px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#182943,#0b1120 70%);border:1px solid #ffffff12}.meter-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}.speed{font-size:clamp(48px,9vw,70px);font-weight:800;letter-spacing:-.07em;line-height:1;font-variant-numeric:tabular-nums}.unit{color:var(--muted);font-size:13px;margin-top:8px;letter-spacing:.15em}.phase{color:var(--cyan);font-size:11px;letter-spacing:.18em;margin-top:22px;text-transform:uppercase}
+button{border:0;cursor:pointer;border-radius:15px;padding:16px 24px;font-weight:800;font-size:15px;color:#06111d;background:linear-gradient(100deg,#42d7ff,#9a8cff);box-shadow:0 10px 32px #42d7ff2b;transition:transform .2s,filter .2s}button:hover{transform:translateY(-2px);filter:brightness(1.08)}button:disabled{opacity:.55;cursor:wait;transform:none}.controls{text-align:center;margin-top:20px}.hint{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.6}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{padding:19px 17px}.metric-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--cyan)}.metric:nth-child(2) .dot{background:var(--purple)}.metric:nth-child(3) .dot{background:var(--green)}.metric-value{font-size:clamp(24px,4vw,34px);font-weight:750;letter-spacing:-.04em;margin-top:13px;font-variant-numeric:tabular-nums}.metric-unit{font-size:12px;color:var(--muted);font-weight:500}
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.info{padding:17px 19px;color:var(--muted);font-size:12px;line-height:1.6}.info strong{display:block;color:var(--white);font-size:13px;margin-bottom:4px}.history{margin-top:18px;padding:22px}.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.history h2{font-size:15px;margin:0}.clear{background:transparent;color:var(--muted);box-shadow:none;padding:7px 10px;font-size:12px}.history-row{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:8px;padding:11px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.history-row strong{color:var(--white);font-weight:650}.empty{color:var(--muted);font-size:12px;padding:12px 0}footer{text-align:center;color:#687894;font-size:11px;margin-top:28px}footer a{color:#9baed0;text-decoration:none}
+@media(max-width:700px){body{padding:18px 13px 30px}.top{margin-bottom:26px}.test-card{grid-template-columns:1fr;padding:24px 16px;gap:15px}.meter{width:min(75vw,270px)}.metrics{gap:8px}.metric{padding:14px 11px}.metric-label{font-size:10px}.bottom{grid-template-columns:1fr}.history-row{font-size:10px;grid-template-columns:1.1fr repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="brand"><div class="logo">ϟ</div><span>MAJAL <span style="color:var(--cyan)">SPEEDTEST</span></span></div><div class="status">● SYSTEM READY</div></header>
+<h1>How fast is your <span style="background:linear-gradient(90deg,#42d7ff,#a99aff);background-clip:text;color:transparent">internet?</span></h1>
+<p class="sub">A quick check of your connection's performance.</p>
+<section class="glass test-card">
+<div class="meter-wrap"><div class="meter"><div class="meter-inner"><div class="speed" id="mainSpeed">—</div><div class="unit">Mbps</div><div class="phase" id="phase">READY TO TEST</div></div></div><div class="controls"><button id="startBtn">▶ &nbsp; START TEST</button><div class="hint" id="hint">Press start to measure your connection.<br>Keep this tab open while the test runs.</div></div></div>
+<div class="metrics">
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> DOWNLOAD</div><div class="metric-value" id="download">— <span class="metric-unit">Mbps</span></div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> UPLOAD</div><div class="metric-value" id="upload">— <span class="metric-unit">Mbps</span></div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> PING</div><div class="metric-value" id="ping">— <span class="metric-unit">ms</span></div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> JITTER</div><div class="metric-value" id="jitter">— <span class="metric-unit">ms</span></div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> TEST SERVER</div><div class="metric-value" style="font-size:18px;margin-top:18px">Cloudflare</div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> CONNECTION</div><div class="metric-value" id="connection" style="font-size:18px;margin-top:18px">Checking…</div></div>
+</div>
+</section>
+<div class="bottom"><div class="glass info"><strong>About this test</strong>Measurements use Cloudflare's public speed-test endpoint. Your actual results can vary with Wi-Fi signal, device load, routing and server capacity.</div><div class="glass info"><strong>For best results</strong>Pause large downloads and close bandwidth-heavy apps. A wired connection generally gives more consistent measurements than Wi-Fi.</div></div>
+<section class="glass history"><div class="history-head"><h2>Recent tests</h2><button class="clear" id="clearHistory">CLEAR HISTORY</button></div><div id="historyList" class="empty">Your completed tests will appear here.</div></section>
+<footer>MAJAL SPEEDTEST · v1.0.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const endpoint='https://speed.cloudflare.com';
+let running=false;
+const fmt=n=>Number.isFinite(n)?(n>=100? n.toFixed(0):n.toFixed(2)):'—';
+function setMetric(id,value,unit){$(id).innerHTML=fmt(value)+' <span class="metric-unit">'+unit+'</span>'}
+function phase(text){$('phase').textContent=text}
+function saveHistory(result){
+ let items=[];try{items=JSON.parse(localStorage.getItem('majal-speedtest-history')||'[]')}catch{}
+ items.unshift({date:new Date().toLocaleString(),...result});items=items.slice(0,8);
+ try{localStorage.setItem('majal-speedtest-history',JSON.stringify(items))}catch{}
+ renderHistory();
+}
+function renderHistory(){
+ let items=[];try{items=JSON.parse(localStorage.getItem('majal-speedtest-history')||'[]')}catch{}
+ $('historyList').innerHTML=items.length?items.map(x=>'<div class="history-row"><span>'+x.date+'</span><strong>'+fmt(x.down)+' ↓</strong><strong>'+fmt(x.up)+' ↑</strong><strong>'+fmt(x.ping)+' ms</strong></div>').join(''):'Your completed tests will appear here.';
+}
+async function pingTest(){
+ const samples=[];
+ for(let i=0;i<8;i++){
+  const t=performance.now();
+  const r=await fetch(endpoint+'/__down?bytes=0&cacheBust='+Math.random(),{cache:'no-store'});
+  if(!r.ok)throw Error('Ping endpoint returned '+r.status);
+  await r.arrayBuffer();samples.push(performance.now()-t);
+ }
+ const avg=samples.reduce((a,b)=>a+b,0)/samples.length;
+ const jitter=samples.slice(1).reduce((a,b,i)=>a+Math.abs(b-samples[i]),0)/(samples.length-1);
+ return {ping:avg,jitter};
+}
+async function downloadTest(){
+ const bytes=18000000, start=performance.now();
+ const response=await fetch(endpoint+'/__down?bytes='+bytes+'&cacheBust='+Math.random(),{cache:'no-store'});
+ if(!response.ok)throw Error('Download test failed ('+response.status+').');
+ const reader=response.body.getReader();let received=0,last=start,lastBytes=0,shown=0;
+ while(true){
+  const {done,value}=await reader.read();if(done)break;
+  received+=value.byteLength;
+  const now=performance.now();
+  if(now-last>180){const mbps=((received-lastBytes)*8)/(now-last)/1000;$('mainSpeed').textContent=fmt(mbps);last=now;lastBytes=received;}
+ }
+ const elapsed=(performance.now()-start)/1000;
+ return received*8/elapsed/1e6;
+}
+async function uploadTest(){
+ const bytes=6000000, payload=new Blob([new Uint8Array(bytes)]);
+ const start=performance.now();
+ const response=await fetch(endpoint+'/__up?cacheBust='+Math.random(),{method:'POST',body:payload,cache:'no-store'});
+ if(!response.ok)throw Error('Upload test failed ('+response.status+').');
+ await response.arrayBuffer();
+ return bytes*8/((performance.now()-start)/1000)/1e6;
+}
+$('startBtn').addEventListener('click',async()=>{
+ if(running)return;running=true;$('startBtn').disabled=true;$('startBtn').textContent='TEST RUNNING…';
+ $('mainSpeed').textContent='—';['download','upload','ping','jitter'].forEach(id=>setMetric(id,NaN,id==='download'||id==='upload'?'Mbps':'ms'));
+ try{
+  phase('PING TEST');$('hint').textContent='Measuring latency…';
+  const latency=await pingTest();setMetric('ping',latency.ping,'ms');setMetric('jitter',latency.jitter,'ms');
+  phase('DOWNLOAD');$('hint').textContent='Measuring download throughput…';
+  const down=await downloadTest();setMetric('download',down,'Mbps');$('mainSpeed').textContent=fmt(down);
+  phase('UPLOAD');$('hint').textContent='Measuring upload throughput…';
+  const up=await uploadTest();setMetric('upload',up,'Mbps');
+  phase('COMPLETE');$('hint').textContent='Test complete. Results saved on this device.';
+  $('connection').textContent=navigator.connection?.effectiveType?.toUpperCase()||'Browser';
+  saveHistory({down,up,ping:latency.ping,jitter:latency.jitter});
+ }catch(err){phase('TEST FAILED');$('hint').textContent=err.message+' Check your connection or try again. The test endpoint may be unavailable or blocked.';console.error(err)}
+ finally{$('startBtn').disabled=false;$('startBtn').textContent='↻  RUN AGAIN';running=false}
+});
+$('clearHistory').addEventListener('click',()=>{localStorage.removeItem('majal-speedtest-history');renderHistory()});
+$('connection').textContent=navigator.connection?.effectiveType?.toUpperCase()||'Browser';
+renderHistory();
+</script>
+</body>
+</html>
