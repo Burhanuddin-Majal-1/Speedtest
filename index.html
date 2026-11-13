@@ -85,12 +85,12 @@ async function fixedWindow(ms,parentSignal,task){
  const started=performance.now(),deadline=started+ms;
  const work=Promise.resolve().then(()=>task(phaseController.signal,deadline));
  let workError=null,workResult=null;
- work.then(v=>{workResult=v},e=>{workError=e});
+ work.then(v=>{workResult=v},e=>{if(!phaseController.signal.aborted)workError=e});
  try{await delay(ms,parentSignal)}catch(e){phaseController.abort(e);parentSignal.removeEventListener('abort',onParentAbort);throw e}
  phaseController.abort(new Error('Measurement window ended'));
- await Promise.race([work.then(()=>{},e=>{workError=e}),delay(1200).catch(()=>{})]);
+ await work.then(v=>{workResult=v},e=>{if(!phaseController.signal.aborted)workError=e});
  parentSignal.removeEventListener('abort',onParentAbort);
- if(workError&&!phaseController.signal.aborted)throw workError;
+ if(workError)throw workError;
  return {result:workResult,elapsed:performance.now()-started,deadline};
 }
 async function latencyWindow(signal,deadline){
