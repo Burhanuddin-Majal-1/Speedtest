@@ -2,7 +2,7 @@
 
 An advanced, static browser-based network diagnostics page built with plain HTML, CSS and JavaScript. No build step, account, or project-owned backend is required.
 
-## Diagnostics
+## Fixed-duration test cycle\n\nA full run uses a **25-second target measurement window** split into three timed phases:\n\n- 0–5 seconds: HTTP latency and alternating Google / Cloudflare DNS-over-HTTPS samples.\n- 5–15 seconds: three concurrent Cloudflare download streams.\n- 15–25 seconds: three concurrent Cloudflare upload streams using repeated acknowledged chunks.\n\nThe countdown is driven by the browser high-resolution clock. Browser tab throttling, a suspended device, or delayed network request cancellation can make the displayed completion occur slightly after the 25-second target; web pages cannot guarantee hard real-time scheduling. Stopping manually cancels the run and does not produce a completed result.\n\n## Diagnostics
 
 - **Download throughput:** three concurrent Cloudflare HTTP download streams, measuring received bytes over elapsed time.
 - **Upload throughput:** three concurrent HTTP upload requests to Cloudflare.
@@ -30,7 +30,7 @@ This is a browser-based estimate, not a professional router or line-certificatio
 - DNS values are **DNS-over-HTTPS transaction timings**. They include browser scheduling, connection setup/reuse, TLS, network routing and resolver response time; they are not raw UDP port 53 DNS timings.
 - A failed HTTP probe is not proof of packet loss. Browser scheduling, CORS, server errors, throttling, transient congestion and other factors can cause failures.
 - The browser cannot reliably expose Wi-Fi signal strength (RSSI), channel width, negotiated PHY rate, router queueing, WAN link rate, or the ISP's exact path.
-- Throughput uses three concurrent streams and a fixed data volume (up to approximately 24 MB download and 6 MB upload). Very fast or unstable connections, device CPU limits, browser throttling, endpoint load and concurrent traffic can affect results.
+- Throughput uses three concurrent streams in fixed 10-second windows. The amount of data transferred varies with connection speed. Very fast or unstable connections, device CPU limits, browser throttling, endpoint load and concurrent traffic can affect results.
 - The browser's Network Information API is optional and unsupported in many browsers. Its values are estimates, not independently measured link characteristics.
 - Results can differ from native tools such as `ping`, `mtr`, `iperf3`, router diagnostics and ISP tests. Use those tools for deeper fault isolation and controlled measurements.
 
