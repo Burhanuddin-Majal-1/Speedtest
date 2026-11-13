@@ -31,11 +31,12 @@ button{border:0;cursor:pointer;border-radius:15px;padding:16px 24px;font-weight:
 <div class="glass metric"><div class="metric-label"><i class="dot"></i> UPLOAD</div><div class="metric-value" id="upload">— <span class="metric-unit">Mbps</span></div></div>
 <div class="glass metric"><div class="metric-label"><i class="dot"></i> PING</div><div class="metric-value" id="ping">— <span class="metric-unit">ms</span></div></div>
 <div class="glass metric"><div class="metric-label"><i class="dot"></i> JITTER</div><div class="metric-value" id="jitter">— <span class="metric-unit">ms</span></div></div>
+<div class="glass metric"><div class="metric-label"><i class="dot"></i> GOOGLE DNS</div><div class="metric-value" id="dnsLatency">— <span class="metric-unit">ms</span></div></div>
 <div class="glass metric"><div class="metric-label"><i class="dot"></i> TEST SERVER</div><div class="metric-value" style="font-size:18px;margin-top:18px">Cloudflare</div></div>
 <div class="glass metric"><div class="metric-label"><i class="dot"></i> CONNECTION</div><div class="metric-value" id="connection" style="font-size:18px;margin-top:18px">Checking…</div></div>
 </div>
 </section>
-<div class="bottom"><div class="glass info"><strong>About this test</strong>Measurements use Cloudflare's public speed-test endpoint. Your actual results can vary with Wi-Fi signal, device load, routing and server capacity.</div><div class="glass info"><strong>For best results</strong>Pause large downloads and close bandwidth-heavy apps. A wired connection generally gives more consistent measurements than Wi-Fi.</div></div>
+<div class="bottom"><div class="glass info"><strong>About this test</strong>Download and upload use Cloudflare's public speed-test endpoint. Google DNS latency measures a DNS-over-HTTPS lookup through Google's resolver (8.8.8.8), not a direct ICMP ping. Results vary with Wi-Fi signal, device load and routing.</div><div class="glass info"><strong>For best results</strong>Pause large downloads and close bandwidth-heavy apps. A wired connection generally gives more consistent measurements than Wi-Fi.</div></div>
 <section class="glass history"><div class="history-head"><h2>Recent tests</h2><button class="clear" id="clearHistory">CLEAR HISTORY</button></div><div id="historyList" class="empty">Your completed tests will appear here.</div></section>
 <footer>MAJAL SPEEDTEST · v1.0.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
 </main>
@@ -68,6 +69,15 @@ async function pingTest(){
  const jitter=samples.slice(1).reduce((a,b,i)=>a+Math.abs(b-samples[i]),0)/(samples.length-1);
  return {ping:avg,jitter};
 }
+async function googleDnsTest(){
+ const url='https://dns.google/resolve?name=google.com&type=A&nonce='+Math.random();
+ const start=performance.now();
+ const response=await fetch(url,{cache:'no-store',headers:{'Accept':'application/dns-json'}});
+ if(!response.ok)throw Error('Google DNS request failed ('+response.status+').');
+ const data=await response.json();
+ if(typeof data.Status!=='number')throw Error('Google DNS returned an unexpected response.');
+ return performance.now()-start;
+}
 async function downloadTest(){
  const bytes=18000000, start=performance.now();
  const response=await fetch(endpoint+'/__down?bytes='+bytes+'&cacheBust='+Math.random(),{cache:'no-store'});
@@ -96,6 +106,8 @@ $('startBtn').addEventListener('click',async()=>{
  try{
   phase('PING TEST');$('hint').textContent='Measuring latency…';
   const latency=await pingTest();setMetric('ping',latency.ping,'ms');setMetric('jitter',latency.jitter,'ms');
+  phase('GOOGLE DNS');$('hint').textContent='Measuring response time from Google Public DNS (8.8.8.8)…';
+  const dnsLatency=await googleDnsTest();setMetric('dnsLatency',dnsLatency,'ms');
   phase('DOWNLOAD');$('hint').textContent='Measuring download throughput…';
   const down=await downloadTest();setMetric('download',down,'Mbps');$('mainSpeed').textContent=fmt(down);
   phase('UPLOAD');$('hint').textContent='Measuring upload throughput…';
