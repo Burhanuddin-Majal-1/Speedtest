@@ -1,47 +1,28 @@
 # Majal Network Lab
 
-An advanced, static browser-based network diagnostics page built with plain HTML, CSS and JavaScript. No build step, account, or project-owned backend is required.
+A static internet speed-test page hosted on GitHub Pages.
 
-## Fixed-duration test cycle\n\nA full run uses a **25-second target measurement window** split into three timed phases:\n\n- 0–5 seconds: HTTP latency and alternating Google / Cloudflare DNS-over-HTTPS samples.\n- 5–15 seconds: three concurrent Cloudflare download streams.\n- 15–25 seconds: three concurrent Cloudflare upload streams using repeated acknowledged chunks.\n\nThe countdown is driven by the browser high-resolution clock. Browser tab throttling, a suspended device, or delayed network request cancellation can make the displayed completion occur slightly after the 25-second target; web pages cannot guarantee hard real-time scheduling. Stopping manually cancels the run and does not produce a completed result.\n\n## Diagnostics
+## Implementation
 
-- **Download throughput:** three concurrent Cloudflare HTTP download streams, measuring received bytes over elapsed time.
-- **Upload throughput:** three concurrent HTTP upload requests to Cloudflare.
-- **HTTP latency distribution:** 20 sequential zero-byte HTTP probes, with minimum, median, average, 95th percentile and maximum.
-- **HTTP jitter estimate:** median absolute difference between adjacent successful HTTP probe timings.
-- **DNS-over-HTTPS timing:** repeated lookups through Google Public DNS (`dns.google`, resolver service associated with 8.8.8.8) and Cloudflare DNS (`cloudflare-dns.com`, resolver service associated with 1.1.1.1).
-- **HTTP probe failure rate:** failed HTTP probes divided by attempted HTTP probes. This is deliberately not called packet loss.
-- **Exportable JSON report** and local test history.
-- Responsive dark interface and stop control.
+This repository currently uses the FAST.com web interface bundle and its associated browser-side assets. The page measures network performance through FAST.com's service infrastructure; it is not an independently operated measurement backend.
 
-## Deploy with GitHub Pages
+- `index.html` — page markup
+- `app-07ba96.css` — styles
+- `app-0bffe1.js` — browser test application
+- `assets/` — logo, icon font stylesheet, and font file
 
-1. Open **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select **main** and **/(root)**, then save.
-4. Wait for GitHub Pages to publish the site.
+## GitHub Pages
 
-The entry point is `index.html`.
+The page uses relative paths for local stylesheets, scripts, fonts, and logos so it can load from a project site such as:
 
-## Measurement limitations — read this
+`https://burhanuddin-majal-1.github.io/Speedtest/`
 
-This is a browser-based estimate, not a professional router or line-certification tool.
+The missing favicon references were removed rather than pointing browsers at files that are not in this repository.
 
-- Browser JavaScript cannot send raw ICMP echo requests. The displayed latency is **HTTP request timing**, not ICMP ping.
-- DNS values are **DNS-over-HTTPS transaction timings**. They include browser scheduling, connection setup/reuse, TLS, network routing and resolver response time; they are not raw UDP port 53 DNS timings.
-- A failed HTTP probe is not proof of packet loss. Browser scheduling, CORS, server errors, throttling, transient congestion and other factors can cause failures.
-- The browser cannot reliably expose Wi-Fi signal strength (RSSI), channel width, negotiated PHY rate, router queueing, WAN link rate, or the ISP's exact path.
-- Throughput uses three concurrent streams in fixed 10-second windows. The amount of data transferred varies with connection speed. Very fast or unstable connections, device CPU limits, browser throttling, endpoint load and concurrent traffic can affect results.
-- The browser's Network Information API is optional and unsupported in many browsers. Its values are estimates, not independently measured link characteristics.
-- Results can differ from native tools such as `ping`, `mtr`, `iperf3`, router diagnostics and ISP tests. Use those tools for deeper fault isolation and controlled measurements.
+## Service and attribution
 
-## Data, privacy and network usage
+FAST.com is operated by Netflix. This project is an independent, unofficial deployment and is not affiliated with or endorsed by Netflix. The speed-test application contacts FAST.com/Netflix infrastructure, and its availability, behavior, terms, and permitted use are controlled by that service. Review the upstream project's applicable license and terms before redistributing or modifying its bundled source.
 
-- Recent results are stored in this browser's `localStorage`; use **Clear** to remove them.
-- **Export JSON** creates a report file locally when a completed test is available.
-- No project-owned analytics or result-upload backend is included.
-- Running a full test transfers up to roughly 30 MB, excluding HTTP/DNS request overhead. Avoid repeated tests on metered connections.
-- The page contacts Cloudflare's public speed-test endpoint and Google's and Cloudflare's public DNS-over-HTTPS services. Those providers process the requests according to their own policies.
+## Important
 
-## Built with
-
-Plain HTML, CSS and JavaScript · [GitHub repository](https://github.com/Burhanuddin-Majal-1/Speedtest) · [Majal Technologies](https://github.com/Burhanuddin-Majal-1)
+Results depend on the browser, device, connection, routing, and FAST.com test servers. This page is not a substitute for an ISP service-level test or a certified network measurement.
