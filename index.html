@@ -4,123 +4,104 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080b14">
-<meta name="description" content="Measure your internet download speed, upload speed, ping and jitter with Majal Speedtest.">
-<title>Majal Speedtest — Internet Performance</title>
+<meta name="description" content="Advanced browser-based network diagnostics: throughput, HTTP latency, jitter, DNS response time and connection quality.">
+<title>Majal Speedtest — Network Diagnostics</title>
 <style>
-:root{color-scheme:dark;--bg:#080b14;--panel:rgba(18,25,43,.78);--line:rgba(148,163,184,.15);--muted:#93a4bf;--white:#f4f7ff;--cyan:#42d7ff;--purple:#9b8cff;--green:#50e3ad}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#18335a 0,transparent 48%),radial-gradient(circle at 90% 70%,#241b50 0,transparent 28%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--white);padding:28px 18px 40px}
-main{max-width:980px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:10px 0 34px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.12em}.logo{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#42d7ff,#8170ff);color:#07101c;font-size:21px;box-shadow:0 8px 30px #42d7ff35}.status{font-size:11px;color:var(--green);border:1px solid #50e3ad50;border-radius:99px;padding:7px 11px;letter-spacing:.1em}
-h1{text-align:center;font-size:clamp(28px,5vw,48px);letter-spacing:-.045em;margin:0}.sub{text-align:center;color:var(--muted);margin:10px 0 30px;font-size:14px}
-.glass{background:linear-gradient(145deg,rgba(26,37,61,.88),rgba(12,17,31,.84));border:1px solid var(--line);border-radius:26px;box-shadow:0 24px 80px #0006,inset 0 1px #ffffff0b;backdrop-filter:blur(18px)}
-.test-card{padding:30px 24px 25px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}.meter-wrap{display:grid;place-items:center}.meter{width:min(100%,310px);aspect-ratio:1;border-radius:50%;padding:13px;background:conic-gradient(from 220deg,#42d7ff 0deg,#897aff 100deg,#24334d 100deg 280deg,transparent 280deg);position:relative;filter:drop-shadow(0 0 24px #42d7ff28)}.meter:before{content:"";position:absolute;inset:13px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#182943,#0b1120 70%);border:1px solid #ffffff12}.meter-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}.speed{font-size:clamp(48px,9vw,70px);font-weight:800;letter-spacing:-.07em;line-height:1;font-variant-numeric:tabular-nums}.unit{color:var(--muted);font-size:13px;margin-top:8px;letter-spacing:.15em}.phase{color:var(--cyan);font-size:11px;letter-spacing:.18em;margin-top:22px;text-transform:uppercase}
-button{border:0;cursor:pointer;border-radius:15px;padding:16px 24px;font-weight:800;font-size:15px;color:#06111d;background:linear-gradient(100deg,#42d7ff,#9a8cff);box-shadow:0 10px 32px #42d7ff2b;transition:transform .2s,filter .2s}button:hover{transform:translateY(-2px);filter:brightness(1.08)}button:disabled{opacity:.55;cursor:wait;transform:none}.controls{text-align:center;margin-top:20px}.hint{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.6}
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{padding:19px 17px}.metric-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--cyan)}.metric:nth-child(2) .dot{background:var(--purple)}.metric:nth-child(3) .dot{background:var(--green)}.metric-value{font-size:clamp(24px,4vw,34px);font-weight:750;letter-spacing:-.04em;margin-top:13px;font-variant-numeric:tabular-nums}.metric-unit{font-size:12px;color:var(--muted);font-weight:500}
-.bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.info{padding:17px 19px;color:var(--muted);font-size:12px;line-height:1.6}.info strong{display:block;color:var(--white);font-size:13px;margin-bottom:4px}.history{margin-top:18px;padding:22px}.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.history h2{font-size:15px;margin:0}.clear{background:transparent;color:var(--muted);box-shadow:none;padding:7px 10px;font-size:12px}.history-row{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:8px;padding:11px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.history-row strong{color:var(--white);font-weight:650}.empty{color:var(--muted);font-size:12px;padding:12px 0}footer{text-align:center;color:#687894;font-size:11px;margin-top:28px}footer a{color:#9baed0;text-decoration:none}
-@media(max-width:700px){body{padding:18px 13px 30px}.top{margin-bottom:26px}.test-card{grid-template-columns:1fr;padding:24px 16px;gap:15px}.meter{width:min(75vw,270px)}.metrics{gap:8px}.metric{padding:14px 11px}.metric-label{font-size:10px}.bottom{grid-template-columns:1fr}.history-row{font-size:10px;grid-template-columns:1.1fr repeat(3,1fr)}}
+:root{color-scheme:dark;--bg:#080b14;--panel:rgba(18,25,43,.82);--line:rgba(148,163,184,.16);--muted:#93a4bf;--white:#f4f7ff;--cyan:#42d7ff;--purple:#9b8cff;--green:#50e3ad;--amber:#ffc66d;--red:#ff7188}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#18335a 0,transparent 48%),radial-gradient(circle at 90% 70%,#241b50 0,transparent 28%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--white);padding:24px 16px 40px}
+main{max-width:1120px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 30px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.12em}.logo{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#42d7ff,#8170ff);color:#07101c;font-size:21px;box-shadow:0 8px 30px #42d7ff35}.status{font-size:11px;color:var(--green);border:1px solid #50e3ad50;border-radius:99px;padding:7px 11px;letter-spacing:.1em}
+h1{text-align:center;font-size:clamp(28px,5vw,48px);letter-spacing:-.045em;margin:0}.sub{text-align:center;color:var(--muted);margin:10px 0 26px;font-size:14px}.glass{background:linear-gradient(145deg,rgba(26,37,61,.88),rgba(12,17,31,.86));border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 65px #0005,inset 0 1px #ffffff0b;backdrop-filter:blur(18px)}
+.hero{padding:24px;display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:center}.meter-wrap{display:grid;place-items:center}.meter{width:min(100%,280px);aspect-ratio:1;border-radius:50%;padding:12px;background:conic-gradient(from 220deg,#42d7ff 0deg,#897aff 100deg,#24334d 100deg 280deg,transparent 280deg);position:relative;filter:drop-shadow(0 0 24px #42d7ff28)}.meter:before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#182943,#0b1120 70%);border:1px solid #ffffff12}.meter-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}.speed{font-size:clamp(48px,8vw,68px);font-weight:800;letter-spacing:-.07em;line-height:1;font-variant-numeric:tabular-nums}.unit{color:var(--muted);font-size:12px;margin-top:8px;letter-spacing:.15em}.phase{color:var(--cyan);font-size:10px;letter-spacing:.16em;margin-top:20px;text-transform:uppercase}
+button{border:0;cursor:pointer;border-radius:13px;padding:13px 19px;font-weight:800;font-size:13px;color:#06111d;background:linear-gradient(100deg,#42d7ff,#9a8cff);box-shadow:0 8px 25px #42d7ff24;transition:transform .2s,filter .2s}button:hover{transform:translateY(-2px);filter:brightness(1.08)}button:disabled{opacity:.5;cursor:wait;transform:none}.secondary{background:#ffffff0b;color:var(--white);border:1px solid var(--line);box-shadow:none}.danger{color:#ff9aab}.controls{text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.hint{color:var(--muted);font-size:11px;margin-top:11px;line-height:1.55;max-width:300px}
+.progress{height:5px;background:#ffffff10;border-radius:20px;overflow:hidden;margin-top:14px;display:none}.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .15s}
+.section-title{font-size:14px;margin:22px 2px 11px;letter-spacing:.02em}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.metric{padding:16px}.metric-label{color:var(--muted);font-size:10px;letter-spacing:.09em;text-transform:uppercase}.metric-value{font-size:clamp(22px,3vw,31px);font-weight:760;letter-spacing:-.04em;margin-top:9px;font-variant-numeric:tabular-nums}.metric-unit{font-size:11px;color:var(--muted);font-weight:500}.metric-note{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{padding:18px}.panel h2{font-size:14px;margin:0 0 13px}.stat-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:12px}.stat-row span{color:var(--muted)}.stat-row strong{text-align:right;font-variant-numeric:tabular-nums}
+.table-wrap{overflow-x:auto}.samples{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}.samples th,.samples td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line)}.samples th:first-child,.samples td:first-child{text-align:left}.samples th{color:var(--muted);font-weight:600}
+.history{margin-top:14px;padding:18px}.history-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.history h2{font-size:14px;margin:0}.history-row{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.history-row strong{color:var(--white);font-weight:650}.empty{color:var(--muted);font-size:12px;padding:10px 0}
+.notice{padding:14px 16px;margin-top:14px;color:var(--muted);font-size:11px;line-height:1.6}.notice strong{color:var(--white)}footer{text-align:center;color:#687894;font-size:11px;margin-top:24px}footer a{color:#9baed0;text-decoration:none}
+@media(max-width:820px){.hero{grid-template-columns:1fr}.meter{width:min(72vw,260px)}.metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:580px){body{padding:16px 11px 28px}.top{margin-bottom:22px}.hero{padding:18px 12px}.grid2{grid-template-columns:1fr}.history-row{grid-template-columns:1.2fr repeat(2,1fr)}.history-row span:nth-child(n+4){display:none}.metric{padding:13px}.status{font-size:9px}}
 </style>
 </head>
 <body>
 <main>
-<header class="top"><div class="brand"><div class="logo">ϟ</div><span>MAJAL <span style="color:var(--cyan)">SPEEDTEST</span></span></div><div class="status">● SYSTEM READY</div></header>
-<h1>How fast is your <span style="background:linear-gradient(90deg,#42d7ff,#a99aff);background-clip:text;color:transparent">internet?</span></h1>
-<p class="sub">A quick check of your connection's performance.</p>
-<section class="glass test-card">
-<div class="meter-wrap"><div class="meter"><div class="meter-inner"><div class="speed" id="mainSpeed">—</div><div class="unit">Mbps</div><div class="phase" id="phase">READY TO TEST</div></div></div><div class="controls"><button id="startBtn">▶ &nbsp; START TEST</button><div class="hint" id="hint">Press start to measure your connection.<br>Keep this tab open while the test runs.</div></div></div>
-<div class="metrics">
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> DOWNLOAD</div><div class="metric-value" id="download">— <span class="metric-unit">Mbps</span></div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> UPLOAD</div><div class="metric-value" id="upload">— <span class="metric-unit">Mbps</span></div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> PING</div><div class="metric-value" id="ping">— <span class="metric-unit">ms</span></div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> JITTER</div><div class="metric-value" id="jitter">— <span class="metric-unit">ms</span></div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> GOOGLE DNS</div><div class="metric-value" id="dnsLatency">— <span class="metric-unit">ms</span></div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> TEST SERVER</div><div class="metric-value" style="font-size:18px;margin-top:18px">Cloudflare</div></div>
-<div class="glass metric"><div class="metric-label"><i class="dot"></i> CONNECTION</div><div class="metric-value" id="connection" style="font-size:18px;margin-top:18px">Checking…</div></div>
-</div>
+<header class="top"><div class="brand"><div class="logo">ϟ</div><span>MAJAL <span style="color:var(--cyan)">NETWORK LAB</span></span></div><div class="status" id="systemStatus">● READY</div></header>
+<h1>Network <span style="background:linear-gradient(90deg,#42d7ff,#a99aff);background-clip:text;color:transparent">Diagnostics</span></h1>
+<p class="sub">A browser-based connection assessment with transparent measurement methods.</p>
+<section class="glass hero">
+ <div class="meter-wrap"><div class="meter"><div class="meter-inner"><div class="speed" id="mainSpeed">—</div><div class="unit">Mbps · DOWNLOAD</div><div class="phase" id="phase">READY TO TEST</div></div></div>
+ <div class="controls"><button id="startBtn">▶ &nbsp; RUN FULL TEST</button><button class="secondary" id="stopBtn" disabled>STOP</button></div><div class="progress" id="progress"><i id="progressBar"></i></div><div class="hint" id="hint">Runs HTTP latency, DNS, download and upload tests. Keep this tab active for more consistent results.</div></div>
+ <div><div class="section-title" style="margin-top:0">Core performance</div><div class="metrics">
+  <div class="glass metric"><div class="metric-label">Download</div><div class="metric-value" id="download">— <span class="metric-unit">Mbps</span></div><div class="metric-note">Multi-stream HTTP throughput</div></div>
+  <div class="glass metric"><div class="metric-label">Upload</div><div class="metric-value" id="upload">— <span class="metric-unit">Mbps</span></div><div class="metric-note">Concurrent HTTP upload</div></div>
+  <div class="glass metric"><div class="metric-label">HTTP latency</div><div class="metric-value" id="latency">— <span class="metric-unit">ms</span></div><div class="metric-note">Median request round-trip</div></div>
+  <div class="glass metric"><div class="metric-label">HTTP jitter</div><div class="metric-value" id="jitter">— <span class="metric-unit">ms</span></div><div class="metric-note">Median adjacent latency change</div></div>
+  <div class="glass metric"><div class="metric-label">Google DNS</div><div class="metric-value" id="googleDns">— <span class="metric-unit">ms</span></div><div class="metric-note">dns.google · resolver 8.8.8.8</div></div>
+  <div class="glass metric"><div class="metric-label">Cloudflare DNS</div><div class="metric-value" id="cloudDns">— <span class="metric-unit">ms</span></div><div class="metric-note">cloudflare-dns.com · resolver 1.1.1.1</div></div>
+  <div class="glass metric"><div class="metric-label">HTTP probe failures</div><div class="metric-value" id="probeLoss">— <span class="metric-unit">%</span></div><div class="metric-note">Failed web probes, not ICMP packet loss</div></div>
+  <div class="glass metric"><div class="metric-label">Connection hint</div><div class="metric-value" id="connection" style="font-size:20px">—</div><div class="metric-note">Browser-reported estimate, if available</div></div>
+ </div></div>
 </section>
-<div class="bottom"><div class="glass info"><strong>About this test</strong>Download and upload use Cloudflare's public speed-test endpoint. Google DNS latency measures a DNS-over-HTTPS lookup through Google's resolver (8.8.8.8), not a direct ICMP ping. Results vary with Wi-Fi signal, device load and routing.</div><div class="glass info"><strong>For best results</strong>Pause large downloads and close bandwidth-heavy apps. A wired connection generally gives more consistent measurements than Wi-Fi.</div></div>
-<section class="glass history"><div class="history-head"><h2>Recent tests</h2><button class="clear" id="clearHistory">CLEAR HISTORY</button></div><div id="historyList" class="empty">Your completed tests will appear here.</div></section>
-<footer>MAJAL SPEEDTEST · v1.0.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
+<div class="section-title">Detailed measurements</div>
+<div class="grid2">
+ <section class="glass panel"><h2>Latency distribution · HTTP endpoint</h2>
+  <div class="stat-row"><span>Minimum</span><strong id="latMin">—</strong></div><div class="stat-row"><span>Median</span><strong id="latMedian">—</strong></div><div class="stat-row"><span>Average</span><strong id="latAvg">—</strong></div><div class="stat-row"><span>95th percentile</span><strong id="latP95">—</strong></div><div class="stat-row"><span>Maximum</span><strong id="latMax">—</strong></div><div class="stat-row"><span>Successful / total probes</span><strong id="probeCount">—</strong></div>
+ </section>
+ <section class="glass panel"><h2>Environment & test configuration</h2>
+  <div class="stat-row"><span>Browser platform</span><strong id="platform">—</strong></div><div class="stat-row"><span>Effective connection</span><strong id="effectiveType">—</strong></div><div class="stat-row"><span>Downlink hint</span><strong id="downlinkHint">—</strong></div><div class="stat-row"><span>RTT hint</span><strong id="rttHint">—</strong></div><div class="stat-row"><span>Data saver</span><strong id="saveData">—</strong></div><div class="stat-row"><span>Test endpoint</span><strong>Cloudflare speed.cloudflare.com</strong></div>
+ </section>
+</div>
+<div class="section-title">Latency probe samples</div>
+<section class="glass panel table-wrap"><table class="samples"><thead><tr><th>#</th><th>HTTP latency</th><th>Google DNS</th><th>Cloudflare DNS</th><th>Result</th></tr></thead><tbody id="sampleRows"><tr><td colspan="5" style="text-align:left;color:var(--muted)">Run a test to collect samples.</td></tr></tbody></table></section>
+<section class="glass history"><div class="history-head"><h2>Local test history</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="secondary" id="exportBtn">EXPORT JSON</button><button class="secondary danger" id="clearHistory">CLEAR</button></div></div><div id="historyList" class="empty">Completed tests are saved locally in this browser.</div></section>
+<div class="glass notice"><strong>Measurement integrity:</strong> This is a browser-based estimate, not a substitute for router diagnostics or a native network utility. HTTP request timing includes browser scheduling, TLS/connection reuse, DNS/cache behavior and server response time. DNS timings measure DNS-over-HTTPS request time, not a raw UDP DNS query. Browser JavaScript cannot send ICMP echo requests, read true packet loss, expose your Wi-Fi RSSI/channel, or guarantee the physical link rate. HTTP probe failures are not labelled packet loss. Throughput depends on test-server load, routing, device CPU, browser limits and concurrent traffic.</div>
+<footer>MAJAL NETWORK LAB · v2.0.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
 </main>
 <script>
+'use strict';
 const $=id=>document.getElementById(id);
-const endpoint='https://speed.cloudflare.com';
-let running=false;
-const fmt=n=>Number.isFinite(n)?(n>=100? n.toFixed(0):n.toFixed(2)):'—';
-function setMetric(id,value,unit){$(id).innerHTML=fmt(value)+' <span class="metric-unit">'+unit+'</span>'}
-function phase(text){$('phase').textContent=text}
-function saveHistory(result){
- let items=[];try{items=JSON.parse(localStorage.getItem('majal-speedtest-history')||'[]')}catch{}
- items.unshift({date:new Date().toLocaleString(),...result});items=items.slice(0,8);
- try{localStorage.setItem('majal-speedtest-history',JSON.stringify(items))}catch{}
- renderHistory();
-}
-function renderHistory(){
- let items=[];try{items=JSON.parse(localStorage.getItem('majal-speedtest-history')||'[]')}catch{}
- $('historyList').innerHTML=items.length?items.map(x=>'<div class="history-row"><span>'+x.date+'</span><strong>'+fmt(x.down)+' ↓</strong><strong>'+fmt(x.up)+' ↑</strong><strong>'+fmt(x.ping)+' ms</strong></div>').join(''):'Your completed tests will appear here.';
-}
-async function pingTest(){
- const samples=[];
- for(let i=0;i<8;i++){
-  const t=performance.now();
-  const r=await fetch(endpoint+'/__down?bytes=0&cacheBust='+Math.random(),{cache:'no-store'});
-  if(!r.ok)throw Error('Ping endpoint returned '+r.status);
-  await r.arrayBuffer();samples.push(performance.now()-t);
- }
- const avg=samples.reduce((a,b)=>a+b,0)/samples.length;
- const jitter=samples.slice(1).reduce((a,b,i)=>a+Math.abs(b-samples[i]),0)/(samples.length-1);
- return {ping:avg,jitter};
-}
-async function googleDnsTest(){
- const url='https://dns.google/resolve?name=google.com&type=A&nonce='+Math.random();
- const start=performance.now();
- const response=await fetch(url,{cache:'no-store',headers:{'Accept':'application/dns-json'}});
- if(!response.ok)throw Error('Google DNS request failed ('+response.status+').');
- const data=await response.json();
- if(typeof data.Status!=='number')throw Error('Google DNS returned an unexpected response.');
- return performance.now()-start;
-}
-async function downloadTest(){
- const bytes=18000000, start=performance.now();
- const response=await fetch(endpoint+'/__down?bytes='+bytes+'&cacheBust='+Math.random(),{cache:'no-store'});
- if(!response.ok)throw Error('Download test failed ('+response.status+').');
- const reader=response.body.getReader();let received=0,last=start,lastBytes=0,shown=0;
- while(true){
-  const {done,value}=await reader.read();if(done)break;
-  received+=value.byteLength;
-  const now=performance.now();
-  if(now-last>180){const mbps=((received-lastBytes)*8)/(now-last)/1000;$('mainSpeed').textContent=fmt(mbps);last=now;lastBytes=received;}
- }
- const elapsed=(performance.now()-start)/1000;
- return received*8/elapsed/1e6;
-}
-async function uploadTest(){
- const bytes=6000000, payload=new Blob([new Uint8Array(bytes)]);
- const start=performance.now();
- const response=await fetch(endpoint+'/__up?cacheBust='+Math.random(),{method:'POST',body:payload,cache:'no-store'});
- if(!response.ok)throw Error('Upload test failed ('+response.status+').');
- await response.arrayBuffer();
- return bytes*8/((performance.now()-start)/1000)/1e6;
-}
-$('startBtn').addEventListener('click',async()=>{
- if(running)return;running=true;$('startBtn').disabled=true;$('startBtn').textContent='TEST RUNNING…';
- $('mainSpeed').textContent='—';['download','upload','ping','jitter'].forEach(id=>setMetric(id,NaN,id==='download'||id==='upload'?'Mbps':'ms'));
- try{
-  phase('PING TEST');$('hint').textContent='Measuring latency…';
-  const latency=await pingTest();setMetric('ping',latency.ping,'ms');setMetric('jitter',latency.jitter,'ms');
-  phase('GOOGLE DNS');$('hint').textContent='Measuring response time from Google Public DNS (8.8.8.8)…';
-  const dnsLatency=await googleDnsTest();setMetric('dnsLatency',dnsLatency,'ms');
-  phase('DOWNLOAD');$('hint').textContent='Measuring download throughput…';
-  const down=await downloadTest();setMetric('download',down,'Mbps');$('mainSpeed').textContent=fmt(down);
-  phase('UPLOAD');$('hint').textContent='Measuring upload throughput…';
-  const up=await uploadTest();setMetric('upload',up,'Mbps');
-  phase('COMPLETE');$('hint').textContent='Test complete. Results saved on this device.';
-  $('connection').textContent=navigator.connection?.effectiveType?.toUpperCase()||'Browser';
-  saveHistory({down,up,ping:latency.ping,jitter:latency.jitter});
- }catch(err){phase('TEST FAILED');$('hint').textContent=err.message+' Check your connection or try again. The test endpoint may be unavailable or blocked.';console.error(err)}
- finally{$('startBtn').disabled=false;$('startBtn').textContent='↻  RUN AGAIN';running=false}
-});
-$('clearHistory').addEventListener('click',()=>{localStorage.removeItem('majal-speedtest-history');renderHistory()});
-$('connection').textContent=navigator.connection?.effectiveType?.toUpperCase()||'Browser';
-renderHistory();
+const CF='https://speed.cloudflare.com';
+const GOOGLE='https://dns.google/resolve?name=google.com&type=A';
+const CLOUDFLARE_DNS='https://cloudflare-dns.com/dns-query?name=google.com&type=A';
+const HISTORY_KEY='majal-speedtest-history-v2';
+let activeController=null, running=false, latestReport=null;
+const number=n=>Number.isFinite(n)?(n>=100?n.toFixed(0):n.toFixed(2)):'—';
+const ms=n=>Number.isFinite(n)?number(n)+' ms':'—';
+function metric(id,n,unit){$(id).innerHTML=number(n)+' <span class="metric-unit">'+unit+'</span>'}
+function setPhase(s){$('phase').textContent=s}
+function setProgress(p){$('progress').style.display='block';$('progressBar').style.width=Math.max(0,Math.min(100,p))+'%'}
+function percentile(values,p){if(!values.length)return NaN;const a=[...values].sort((x,y)=>x-y);const pos=(a.length-1)*p;const lo=Math.floor(pos),hi=Math.ceil(pos);return a[lo]+(a[hi]-a[lo])*(pos-lo)}
+function stats(values){if(!values.length)return {min:NaN,median:NaN,avg:NaN,p95:NaN,max:NaN};return {min:Math.min(...values),median:percentile(values,.5),avg:values.reduce((a,b)=>a+b,0)/values.length,p95:percentile(values,.95),max:Math.max(...values)}}
+function jitterOf(values){if(values.length<2)return NaN;const diffs=values.slice(1).map((v,i)=>Math.abs(v-values[i]));return percentile(diffs,.5)}
+function timeoutSignal(parent,msLimit){const c=new AbortController();const t=setTimeout(()=>c.abort(new Error('Request timed out')),msLimit);if(parent){if(parent.aborted)c.abort(parent.reason);else parent.addEventListener('abort',()=>c.abort(parent.reason),{once:true})}return {signal:c.signal,clear:()=>clearTimeout(t)}}
+async function timedFetch(url,options={},parentSignal=null,limit=12000){const guard=timeoutSignal(parentSignal,limit);const start=performance.now();try{const response=await fetch(url,{...options,signal:guard.signal,cache:'no-store'});return {response,elapsed:performance.now()-start}}finally{guard.clear()}}
+async function httpProbe(signal){const {response,elapsed}=await timedFetch(CF+'/__down?bytes=0&cacheBust='+crypto.randomUUID(),{},signal,10000);if(!response.ok)throw new Error('HTTP probe returned '+response.status);await response.arrayBuffer();return elapsed}
+async function dnsProbe(base,signal){const headers=base===CLOUDFLARE_DNS?{'Accept':'application/dns-json'}:{'Accept':'application/dns-json'};const url=base+'&random='+crypto.randomUUID();const {response,elapsed}=await timedFetch(url,{headers},signal,12000);if(!response.ok)throw new Error('DNS-over-HTTPS returned '+response.status);const data=await response.json();if(typeof data.Status!=='number'&& !Array.isArray(data.Answer))throw new Error('Invalid DNS response');return elapsed}
+async function latencyPhase(signal){const rows=[],http=[];const total=20;for(let i=0;i<total;i++){if(signal.aborted)throw signal.reason;const row={index:i+1,http:NaN,google:NaN,cloudflare:NaN,ok:true};try{row.http=await httpProbe(signal);http.push(row.http)}catch(e){if(signal.aborted)throw e;row.ok=false}
+ if(i%2===0){try{row.google=await dnsProbe(GOOGLE,signal)}catch(e){if(signal.aborted)throw e}}
+ else{try{row.cloudflare=await dnsProbe(CLOUDFLARE_DNS,signal)}catch(e){if(signal.aborted)throw e}}
+ rows.push(row);setProgress(5+(i+1)/total*20);$('hint').textContent='Latency and DNS sampling · '+(i+1)+' / '+total;}
+ const dnsG=rows.map(x=>x.google).filter(Number.isFinite),dnsC=rows.map(x=>x.cloudflare).filter(Number.isFinite);
+ return {rows,http,google:dnsG,cloudflare:dnsC,failed:total-http.length,total};}
+async function throughputDownload(signal){const streams=3,bytesEach=8_000_000;let received=0;const started=performance.now();let last=started,lastBytes=0;const tasks=Array.from({length:streams},async(_,i)=>{const {response}=await timedFetch(CF+'/__down?bytes='+bytesEach+'&cacheBust='+crypto.randomUUID(),{},signal,45000);if(!response.ok)throw new Error('Download stream '+(i+1)+' returned '+response.status);if(!response.body)throw new Error('Streaming response unavailable in this browser');const reader=response.body.getReader();while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;const now=performance.now();if(now-last>200){const instant=(received-lastBytes)*8/(now-last)/1000;$('mainSpeed').textContent=number(instant);last=now;lastBytes=received;}}});await Promise.all(tasks);const seconds=(performance.now()-started)/1000;return {mbps:received*8/seconds/1e6,bytes:received,seconds,streams};}
+async function throughputUpload(signal){const streams=3,bytesEach=2_000_000;const payload=new Blob([new Uint8Array(bytesEach)]);let sent=0;const started=performance.now();await Promise.all(Array.from({length:streams},async(_,i)=>{const {response}=await timedFetch(CF+'/__up?cacheBust='+crypto.randomUUID(),{method:'POST',body:payload},signal,45000);if(!response.ok)throw new Error('Upload stream '+(i+1)+' returned '+response.status);await response.arrayBuffer();sent+=bytesEach;}));const seconds=(performance.now()-started)/1000;return {mbps:sent*8/seconds/1e6,bytes:sent,seconds,streams};}
+function updateEnvironment(){const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;$('platform').textContent=navigator.userAgentData?.platform||navigator.platform||'Not exposed';$('effectiveType').textContent=c?.effectiveType||'Not exposed';$('downlinkHint').textContent=Number.isFinite(c?.downlink)?c.downlink+' Mbps':'Not exposed';$('rttHint').textContent=Number.isFinite(c?.rtt)?c.rtt+' ms':'Not exposed';$('saveData').textContent=c?.saveData?'Enabled':'Disabled / unavailable';$('connection').textContent=c?.effectiveType?.toUpperCase()||'Unavailable';}
+function renderSamples(rows){$('sampleRows').replaceChildren();rows.forEach(r=>{const tr=document.createElement('tr');[r.index,Number.isFinite(r.http)?ms(r.http):'Failed',Number.isFinite(r.google)?ms(r.google):'—',Number.isFinite(r.cloudflare)?ms(r.cloudflare):'—',r.ok?'OK':'HTTP error'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});$('sampleRows').append(tr)});}
+function safeHistory(){try{const v=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x.date==='string').slice(0,10):[]}catch{return []}}
+function renderHistory(){const list=safeHistory();$('historyList').replaceChildren();if(!list.length){$('historyList').textContent='Completed tests are saved locally in this browser.';return}list.forEach(x=>{const row=document.createElement('div');row.className='history-row';[x.date,number(x.download)+' Mbps',number(x.upload)+' Mbps',ms(x.latency),number(x.probeFailureRate)+'% failed'].forEach((v,i)=>{const el=document.createElement(i?'strong':'span');el.textContent=v;row.append(el)});$('historyList').append(row)})}
+function saveReport(report){const list=safeHistory();list.unshift({date:new Date().toLocaleString(),download:report.download.mbps,upload:report.upload.mbps,latency:report.httpStats.median,probeFailureRate:report.probeFailureRate});try{localStorage.setItem(HISTORY_KEY,JSON.stringify(list.slice(0,10)))}catch{}renderHistory()}
+function renderReport(r){metric('download',r.download.mbps,'Mbps');metric('upload',r.upload.mbps,'Mbps');metric('latency',r.httpStats.median,'ms');metric('jitter',r.httpJitter,'ms');metric('googleDns',r.googleStats.median,'ms');metric('cloudDns',r.cloudflareStats.median,'ms');metric('probeLoss',r.probeFailureRate,'%');$('latMin').textContent=ms(r.httpStats.min);$('latMedian').textContent=ms(r.httpStats.median);$('latAvg').textContent=ms(r.httpStats.avg);$('latP95').textContent=ms(r.httpStats.p95);$('latMax').textContent=ms(r.httpStats.max);$('probeCount').textContent=(r.httpStats.samples)+' / '+r.probes.total;$('probeCount').textContent=(r.probes.total-r.probes.failed)+' / '+r.probes.total;renderSamples(r.probes.rows)}
+function makeReport(probes,download,upload){const httpStats=stats(probes.http),googleStats=stats(probes.google),cloudflareStats=stats(probes.cloudflare);return {timestamp:new Date().toISOString(),download,upload,httpStats:{...httpStats,samples:probes.http.length},googleStats,cloudflareStats,httpJitter:jitterOf(probes.http),probeFailureRate:probes.failed/probes.total*100,probes:{...probes}}}
+async function run(){if(running)return;running=true;activeController=new AbortController();const signal=activeController.signal;$('startBtn').disabled=true;$('stopBtn').disabled=false;$('systemStatus').textContent='● TESTING';$('systemStatus').style.color='var(--amber)';$('hint').textContent='Starting test sequence…';$('mainSpeed').textContent='—';setProgress(0);setPhase('LATENCY');try{
+ const probes=await latencyPhase(signal);const httpStats=stats(probes.http);metric('latency',httpStats.median,'ms');metric('jitter',jitterOf(probes.http),'ms');metric('googleDns',stats(probes.google).median,'ms');metric('cloudDns',stats(probes.cloudflare).median,'ms');metric('probeLoss',probes.failed/probes.total*100,'%');$('latMin').textContent=ms(httpStats.min);$('latMedian').textContent=ms(httpStats.median);$('latAvg').textContent=ms(httpStats.avg);$('latP95').textContent=ms(httpStats.p95);$('latMax').textContent=ms(httpStats.max);$('probeCount').textContent=(probes.total-probes.failed)+' / '+probes.total;renderSamples(probes.rows);
+ setPhase('DOWNLOAD');$('hint').textContent='Running 3 concurrent download streams (up to 24 MB)…';const download=await throughputDownload(signal);metric('download',download.mbps,'Mbps');$('mainSpeed').textContent=number(download.mbps);setProgress(65);
+ setPhase('UPLOAD');$('hint').textContent='Running 3 concurrent upload streams (up to 6 MB)…';const upload=await throughputUpload(signal);metric('upload',upload.mbps,'Mbps');setProgress(100);
+ latestReport=makeReport(probes,download,upload);saveReport(latestReport);setPhase('COMPLETE');$('hint').textContent='Finished. Export JSON for the full measurement report.';$('systemStatus').textContent='● COMPLETE';$('systemStatus').style.color='var(--green)';
+ }catch(e){setPhase(signal.aborted?'STOPPED':'TEST ERROR');$('hint').textContent=(signal.aborted?'Test stopped. ':((e&&e.message)||'Unknown error')+'. ')+(signal.aborted?'':'Check browser permissions, connection and endpoint availability.');$('systemStatus').textContent=signal.aborted?'● STOPPED':'● ERROR';$('systemStatus').style.color='var(--red)';console.error(e)}
+ finally{running=false;activeController=null;$('startBtn').disabled=false;$('stopBtn').disabled=true;$('startBtn').textContent='↻ RUN FULL TEST';}}
+$('startBtn').addEventListener('click',run);$('stopBtn').addEventListener('click',()=>activeController?.abort(new Error('Stopped by user')));
+$('clearHistory').addEventListener('click',()=>{localStorage.removeItem(HISTORY_KEY);renderHistory()});
+$('exportBtn').addEventListener('click',()=>{if(!latestReport){$('hint').textContent='Run a test first to generate an exportable report.';return}const blob=new Blob([JSON.stringify(latestReport,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='majal-network-report-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';a.click();URL.revokeObjectURL(url)});
+updateEnvironment();renderHistory();
 </script>
 </body>
 </html>
