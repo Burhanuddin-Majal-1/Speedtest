@@ -28,7 +28,7 @@ button{border:0;cursor:pointer;border-radius:13px;padding:13px 19px;font-weight:
 <h1>Network <span style="background:linear-gradient(90deg,#42d7ff,#a99aff);background-clip:text;color:transparent">Diagnostics</span></h1>
 <p class="sub">A browser-based connection assessment with transparent measurement methods.</p>
 <section class="glass hero">
- <div class="meter-wrap"><div class="meter"><div class="meter-inner"><div class="speed" id="mainSpeed">—</div><div class="unit">Mbps · DOWNLOAD</div><div class="phase" id="phase">READY TO TEST</div></div></div>
+ <div class="meter-wrap"><div class="meter"><div class="meter-inner"><div class="speed" id="mainSpeed">—</div><div class="unit">Mbps · DOWNLOAD</div><div id="timerDisplay" style="font-size:13px;color:var(--amber);margin-top:9px;font-variant-numeric:tabular-nums">25.0s TEST</div><div class="phase" id="phase">READY TO TEST</div></div></div>
  <div class="controls"><button id="startBtn">▶ &nbsp; RUN FULL TEST</button><button class="secondary" id="stopBtn" disabled>STOP</button></div><div class="progress" id="progress"><i id="progressBar"></i></div><div class="hint" id="hint">Runs HTTP latency, DNS, download and upload tests. Keep this tab active for more consistent results.</div></div>
  <div><div class="section-title" style="margin-top:0">Core performance</div><div class="metrics">
   <div class="glass metric"><div class="metric-label">Download</div><div class="metric-value" id="download">— <span class="metric-unit">Mbps</span></div><div class="metric-note">Multi-stream HTTP throughput</div></div>
@@ -54,7 +54,7 @@ button{border:0;cursor:pointer;border-radius:13px;padding:13px 19px;font-weight:
 <section class="glass panel table-wrap"><table class="samples"><thead><tr><th>#</th><th>HTTP latency</th><th>Google DNS</th><th>Cloudflare DNS</th><th>Result</th></tr></thead><tbody id="sampleRows"><tr><td colspan="5" style="text-align:left;color:var(--muted)">Run a test to collect samples.</td></tr></tbody></table></section>
 <section class="glass history"><div class="history-head"><h2>Local test history</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="secondary" id="exportBtn">EXPORT JSON</button><button class="secondary danger" id="clearHistory">CLEAR</button></div></div><div id="historyList" class="empty">Completed tests are saved locally in this browser.</div></section>
 <div class="glass notice"><strong>Measurement integrity:</strong> This is a browser-based estimate, not a substitute for router diagnostics or a native network utility. HTTP request timing includes browser scheduling, TLS/connection reuse, DNS/cache behavior and server response time. DNS timings measure DNS-over-HTTPS request time, not a raw UDP DNS query. Browser JavaScript cannot send ICMP echo requests, read true packet loss, expose your Wi-Fi RSSI/channel, or guarantee the physical link rate. HTTP probe failures are not labelled packet loss. Throughput depends on test-server load, routing, device CPU, browser limits and concurrent traffic.</div>
-<footer>MAJAL NETWORK LAB · v2.0.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
+<footer>MAJAL NETWORK LAB · v2.1.0 · Built by <a href="https://github.com/Burhanuddin-Majal-1">Majal Technologies</a></footer>
 </main>
 <script>
 'use strict';
@@ -76,14 +76,66 @@ function timeoutSignal(parent,msLimit){const c=new AbortController();const t=set
 async function timedFetch(url,options={},parentSignal=null,limit=12000){const guard=timeoutSignal(parentSignal,limit);const start=performance.now();try{const response=await fetch(url,{...options,signal:guard.signal,cache:'no-store'});return {response,elapsed:performance.now()-start}}finally{guard.clear()}}
 async function httpProbe(signal){const {response,elapsed}=await timedFetch(CF+'/__down?bytes=0&cacheBust='+crypto.randomUUID(),{},signal,10000);if(!response.ok)throw new Error('HTTP probe returned '+response.status);await response.arrayBuffer();return elapsed}
 async function dnsProbe(base,signal){const headers=base===CLOUDFLARE_DNS?{'Accept':'application/dns-json'}:{'Accept':'application/dns-json'};const url=base+'&random='+crypto.randomUUID();const {response,elapsed}=await timedFetch(url,{headers},signal,12000);if(!response.ok)throw new Error('DNS-over-HTTPS returned '+response.status);const data=await response.json();if(typeof data.Status!=='number'&& !Array.isArray(data.Answer))throw new Error('Invalid DNS response');return elapsed}
-async function latencyPhase(signal){const rows=[],http=[];const total=20;for(let i=0;i<total;i++){if(signal.aborted)throw signal.reason;const row={index:i+1,http:NaN,google:NaN,cloudflare:NaN,ok:true};try{row.http=await httpProbe(signal);http.push(row.http)}catch(e){if(signal.aborted)throw e;row.ok=false}
- if(i%2===0){try{row.google=await dnsProbe(GOOGLE,signal)}catch(e){if(signal.aborted)throw e}}
- else{try{row.cloudflare=await dnsProbe(CLOUDFLARE_DNS,signal)}catch(e){if(signal.aborted)throw e}}
- rows.push(row);setProgress(5+(i+1)/total*20);$('hint').textContent='Latency and DNS sampling · '+(i+1)+' / '+total;}
- const dnsG=rows.map(x=>x.google).filter(Number.isFinite),dnsC=rows.map(x=>x.cloudflare).filter(Number.isFinite);
- return {rows,http,google:dnsG,cloudflare:dnsC,failed:total-http.length,total};}
-async function throughputDownload(signal){const streams=3,bytesEach=8_000_000;let received=0;const started=performance.now();let last=started,lastBytes=0;const tasks=Array.from({length:streams},async(_,i)=>{const {response}=await timedFetch(CF+'/__down?bytes='+bytesEach+'&cacheBust='+crypto.randomUUID(),{},signal,45000);if(!response.ok)throw new Error('Download stream '+(i+1)+' returned '+response.status);if(!response.body)throw new Error('Streaming response unavailable in this browser');const reader=response.body.getReader();while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;const now=performance.now();if(now-last>200){const instant=(received-lastBytes)*8/(now-last)/1000;$('mainSpeed').textContent=number(instant);last=now;lastBytes=received;}}});await Promise.all(tasks);const seconds=(performance.now()-started)/1000;return {mbps:received*8/seconds/1e6,bytes:received,seconds,streams};}
-async function throughputUpload(signal){const streams=3,bytesEach=2_000_000;const payload=new Blob([new Uint8Array(bytesEach)]);let sent=0;const started=performance.now();await Promise.all(Array.from({length:streams},async(_,i)=>{const {response}=await timedFetch(CF+'/__up?cacheBust='+crypto.randomUUID(),{method:'POST',body:payload},signal,45000);if(!response.ok)throw new Error('Upload stream '+(i+1)+' returned '+response.status);await response.arrayBuffer();sent+=bytesEach;}));const seconds=(performance.now()-started)/1000;return {mbps:sent*8/seconds/1e6,bytes:sent,seconds,streams};}
+const TEST_PLAN=[{name:'LATENCY + DNS',ms:5000,progress:20},{name:'DOWNLOAD',ms:10000,progress:60},{name:'UPLOAD',ms:10000,progress:100}];
+function delay(ms,signal){return new Promise((resolve,reject)=>{const timer=setTimeout(resolve,ms);if(signal){if(signal.aborted){clearTimeout(timer);reject(signal.reason||new Error('Stopped'))}else signal.addEventListener('abort',()=>{clearTimeout(timer);reject(signal.reason||new Error('Stopped'))},{once:true})}})}
+async function fixedWindow(ms,parentSignal,task){
+ const phaseController=new AbortController();
+ const onParentAbort=()=>phaseController.abort(parentSignal.reason||new Error('Stopped'));
+ if(parentSignal.aborted)onParentAbort();else parentSignal.addEventListener('abort',onParentAbort,{once:true});
+ const started=performance.now(),deadline=started+ms;
+ const work=Promise.resolve().then(()=>task(phaseController.signal,deadline));
+ let workError=null,workResult=null;
+ work.then(v=>{workResult=v},e=>{workError=e});
+ try{await delay(ms,parentSignal)}catch(e){phaseController.abort(e);parentSignal.removeEventListener('abort',onParentAbort);throw e}
+ phaseController.abort(new Error('Measurement window ended'));
+ await Promise.race([work.then(()=>{},e=>{workError=e}),delay(1200).catch(()=>{})]);
+ parentSignal.removeEventListener('abort',onParentAbort);
+ if(workError&&!phaseController.signal.aborted)throw workError;
+ return {result:workResult,elapsed:performance.now()-started,deadline};
+}
+async function latencyWindow(signal,deadline){
+ const rows=[],http=[],google=[],cloudflare=[];let attempted=0,failed=0,index=0;
+ while(performance.now()<deadline&&!signal.aborted){
+  const row={index:++index,http:NaN,google:NaN,cloudflare:NaN,ok:true};attempted++;
+  try{row.http=await httpProbe(signal);http.push(row.http)}catch(e){if(signal.aborted)break;row.ok=false;failed++}
+  if(signal.aborted||performance.now()>=deadline){rows.push(row);break}
+  if(index%2===1){try{row.google=await dnsProbe(GOOGLE,signal);google.push(row.google)}catch(e){if(signal.aborted)break}}
+  else{try{row.cloudflare=await dnsProbe(CLOUDFLARE_DNS,signal);cloudflare.push(row.cloudflare)}catch(e){if(signal.aborted)break}}
+  rows.push(row);setProgress(5+Math.min(1,(performance.now()-(deadline-5000))/5000)*15);
+  $('hint').textContent='Collecting HTTP and DNS samples · '+rows.length+' completed';
+ }
+ return {rows,http,google,cloudflare,failed,total:attempted};
+}
+async function downloadWindow(signal){
+ const streams=3;let received=0,last=performance.now(),lastBytes=0;
+ const tasks=Array.from({length:streams},async()=>{
+  const response=await fetch(CF+'/__down?bytes=1000000000&cacheBust='+crypto.randomUUID(),{cache:'no-store',signal});
+  if(!response.ok)throw new Error('Download endpoint returned '+response.status);
+  if(!response.body)throw new Error('Streaming response unavailable');
+  const reader=response.body.getReader();
+  try{while(!signal.aborted){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;const now=performance.now();if(now-last>=200){$('mainSpeed').textContent=number((received-lastBytes)*8/(now-last)/1000);last=now;lastBytes=received;}}}
+  finally{if(signal.aborted)try{await reader.cancel()}catch{}}
+ });
+ const results=await Promise.allSettled(tasks);
+ const errors=results.filter(x=>x.status==='rejected');
+ if(errors.length===streams)throw errors[0].reason;
+ return {mbps:received*8/10_000_000,bytes:received,seconds:10,streams,partial:true};
+}
+async function uploadWindow(signal){
+ const streams=3,chunkBytes=256_000;let acknowledged=0;
+ const payload=new Blob([new Uint8Array(chunkBytes)]);
+ const tasks=Array.from({length:streams},async()=>{
+  while(!signal.aborted){
+   const response=await fetch(CF+'/__up?cacheBust='+crypto.randomUUID(),{method:'POST',body:payload,cache:'no-store',signal});
+   if(!response.ok)throw new Error('Upload endpoint returned '+response.status);
+   await response.arrayBuffer();acknowledged+=chunkBytes;
+  }
+ });
+ const results=await Promise.allSettled(tasks);
+ const errors=results.filter(x=>x.status==='rejected'&&!signal.aborted);
+ if(errors.length===streams)throw errors[0].reason;
+ return {mbps:acknowledged*8/10_000_000,bytes:acknowledged,seconds:10,streams,partial:true};
+}
 function updateEnvironment(){const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;$('platform').textContent=navigator.userAgentData?.platform||navigator.platform||'Not exposed';$('effectiveType').textContent=c?.effectiveType||'Not exposed';$('downlinkHint').textContent=Number.isFinite(c?.downlink)?c.downlink+' Mbps':'Not exposed';$('rttHint').textContent=Number.isFinite(c?.rtt)?c.rtt+' ms':'Not exposed';$('saveData').textContent=c?.saveData?'Enabled':'Disabled / unavailable';$('connection').textContent=c?.effectiveType?.toUpperCase()||'Unavailable';}
 function renderSamples(rows){$('sampleRows').replaceChildren();rows.forEach(r=>{const tr=document.createElement('tr');[r.index,Number.isFinite(r.http)?ms(r.http):'Failed',Number.isFinite(r.google)?ms(r.google):'—',Number.isFinite(r.cloudflare)?ms(r.cloudflare):'—',r.ok?'OK':'HTTP error'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});$('sampleRows').append(tr)});}
 function safeHistory(){try{const v=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x.date==='string').slice(0,10):[]}catch{return []}}
@@ -91,13 +143,36 @@ function renderHistory(){const list=safeHistory();$('historyList').replaceChildr
 function saveReport(report){const list=safeHistory();list.unshift({date:new Date().toLocaleString(),download:report.download.mbps,upload:report.upload.mbps,latency:report.httpStats.median,probeFailureRate:report.probeFailureRate});try{localStorage.setItem(HISTORY_KEY,JSON.stringify(list.slice(0,10)))}catch{}renderHistory()}
 function renderReport(r){metric('download',r.download.mbps,'Mbps');metric('upload',r.upload.mbps,'Mbps');metric('latency',r.httpStats.median,'ms');metric('jitter',r.httpJitter,'ms');metric('googleDns',r.googleStats.median,'ms');metric('cloudDns',r.cloudflareStats.median,'ms');metric('probeLoss',r.probeFailureRate,'%');$('latMin').textContent=ms(r.httpStats.min);$('latMedian').textContent=ms(r.httpStats.median);$('latAvg').textContent=ms(r.httpStats.avg);$('latP95').textContent=ms(r.httpStats.p95);$('latMax').textContent=ms(r.httpStats.max);$('probeCount').textContent=(r.httpStats.samples)+' / '+r.probes.total;$('probeCount').textContent=(r.probes.total-r.probes.failed)+' / '+r.probes.total;renderSamples(r.probes.rows)}
 function makeReport(probes,download,upload){const httpStats=stats(probes.http),googleStats=stats(probes.google),cloudflareStats=stats(probes.cloudflare);return {timestamp:new Date().toISOString(),download,upload,httpStats:{...httpStats,samples:probes.http.length},googleStats,cloudflareStats,httpJitter:jitterOf(probes.http),probeFailureRate:probes.failed/probes.total*100,probes:{...probes}}}
-async function run(){if(running)return;running=true;activeController=new AbortController();const signal=activeController.signal;$('startBtn').disabled=true;$('stopBtn').disabled=false;$('systemStatus').textContent='● TESTING';$('systemStatus').style.color='var(--amber)';$('hint').textContent='Starting test sequence…';$('mainSpeed').textContent='—';setProgress(0);setPhase('LATENCY');try{
- const probes=await latencyPhase(signal);const httpStats=stats(probes.http);metric('latency',httpStats.median,'ms');metric('jitter',jitterOf(probes.http),'ms');metric('googleDns',stats(probes.google).median,'ms');metric('cloudDns',stats(probes.cloudflare).median,'ms');metric('probeLoss',probes.failed/probes.total*100,'%');$('latMin').textContent=ms(httpStats.min);$('latMedian').textContent=ms(httpStats.median);$('latAvg').textContent=ms(httpStats.avg);$('latP95').textContent=ms(httpStats.p95);$('latMax').textContent=ms(httpStats.max);$('probeCount').textContent=(probes.total-probes.failed)+' / '+probes.total;renderSamples(probes.rows);
- setPhase('DOWNLOAD');$('hint').textContent='Running 3 concurrent download streams (up to 24 MB)…';const download=await throughputDownload(signal);metric('download',download.mbps,'Mbps');$('mainSpeed').textContent=number(download.mbps);setProgress(65);
- setPhase('UPLOAD');$('hint').textContent='Running 3 concurrent upload streams (up to 6 MB)…';const upload=await throughputUpload(signal);metric('upload',upload.mbps,'Mbps');setProgress(100);
- latestReport=makeReport(probes,download,upload);saveReport(latestReport);setPhase('COMPLETE');$('hint').textContent='Finished. Export JSON for the full measurement report.';$('systemStatus').textContent='● COMPLETE';$('systemStatus').style.color='var(--green)';
- }catch(e){setPhase(signal.aborted?'STOPPED':'TEST ERROR');$('hint').textContent=(signal.aborted?'Test stopped. ':((e&&e.message)||'Unknown error')+'. ')+(signal.aborted?'':'Check browser permissions, connection and endpoint availability.');$('systemStatus').textContent=signal.aborted?'● STOPPED':'● ERROR';$('systemStatus').style.color='var(--red)';console.error(e)}
- finally{running=false;activeController=null;$('startBtn').disabled=false;$('stopBtn').disabled=true;$('startBtn').textContent='↻ RUN FULL TEST';}}
+async function run(){
+ if(running)return;
+ running=true;activeController=new AbortController();const signal=activeController.signal;
+ const testStarted=performance.now(),testDeadline=testStarted+25000;
+ $('startBtn').disabled=true;$('stopBtn').disabled=false;$('systemStatus').textContent='● TESTING';$('systemStatus').style.color='var(--amber)';
+ $('hint').textContent='Fixed 25-second test: 5s latency/DNS, 10s download, 10s upload.';$('mainSpeed').textContent='—';setProgress(0);
+ let probes={rows:[],http:[],google:[],cloudflare:[],failed:0,total:0},download={mbps:NaN,bytes:0,seconds:10,streams:3},upload={mbps:NaN,bytes:0,seconds:10,streams:3};
+ const countdown=()=>{if(!running)return;const remaining=Math.max(0,(testDeadline-performance.now())/1000);$('timerDisplay').textContent=remaining.toFixed(1)+'s remaining';};
+ const ticker=setInterval(countdown,50);
+ try{
+  setPhase('LATENCY + DNS');$('hint').textContent='Phase 1/3 · HTTP and DNS measurements (5 seconds)';
+  const p=await fixedWindow(5000,signal,(phaseSignal,deadline)=>latencyWindow(phaseSignal,deadline));
+  probes=p.result||probes;renderSamples(probes.rows);setProgress(20);
+  const httpStats=stats(probes.http);metric('latency',httpStats.median,'ms');metric('jitter',jitterOf(probes.http),'ms');metric('googleDns',stats(probes.google).median,'ms');metric('cloudDns',stats(probes.cloudflare).median,'ms');metric('probeLoss',probes.total?probes.failed/probes.total*100:NaN,'%');
+  $('latMin').textContent=ms(httpStats.min);$('latMedian').textContent=ms(httpStats.median);$('latAvg').textContent=ms(httpStats.avg);$('latP95').textContent=ms(httpStats.p95);$('latMax').textContent=ms(httpStats.max);$('probeCount').textContent=(probes.total-probes.failed)+' / '+probes.total;
+  setPhase('DOWNLOAD');$('hint').textContent='Phase 2/3 · Measuring download for exactly 10 seconds';
+  const d=await fixedWindow(10000,signal,(phaseSignal)=>downloadWindow(phaseSignal));download=d.result||download;metric('download',download.mbps,'Mbps');$('mainSpeed').textContent=number(download.mbps);setProgress(60);
+  setPhase('UPLOAD');$('hint').textContent='Phase 3/3 · Measuring upload for exactly 10 seconds';
+  const u=await fixedWindow(10000,signal,(phaseSignal)=>uploadWindow(phaseSignal));upload=u.result||upload;metric('upload',upload.mbps,'Mbps');setProgress(100);
+  const remaining=testDeadline-performance.now();if(remaining>0)await delay(remaining,signal);
+  const elapsed=(performance.now()-testStarted)/1000;
+  latestReport=makeReport(probes,download,upload);latestReport.testDurationSeconds=elapsed;latestReport.targetDurationSeconds=25;latestReport.phasePlan=TEST_PLAN;
+  saveReport(latestReport);setPhase('COMPLETE');$('timerDisplay').textContent='25.0s test window';$('hint').textContent='Completed 25-second measurement window. Export JSON for the full report.';$('systemStatus').textContent='● COMPLETE';$('systemStatus').style.color='var(--green)';
+ }catch(e){
+  setPhase(signal.aborted?'STOPPED':'TEST ERROR');$('hint').textContent=signal.aborted?'Test stopped before the 25-second window completed.':((e&&e.message)||'Unknown error')+'. Check browser permissions, connection and endpoint availability.';$('systemStatus').textContent=signal.aborted?'● STOPPED':'● ERROR';$('systemStatus').style.color='var(--red)';console.error(e)
+ }finally{
+  clearInterval(ticker);if(signal.aborted)$('timerDisplay').textContent='Test cancelled';
+  running=false;activeController=null;$('startBtn').disabled=false;$('stopBtn').disabled=true;$('startBtn').textContent='↻ RUN FULL TEST';
+ }
+}
 $('startBtn').addEventListener('click',run);$('stopBtn').addEventListener('click',()=>activeController?.abort(new Error('Stopped by user')));
 $('clearHistory').addEventListener('click',()=>{localStorage.removeItem(HISTORY_KEY);renderHistory()});
 $('exportBtn').addEventListener('click',()=>{if(!latestReport){$('hint').textContent='Run a test first to generate an exportable report.';return}const blob=new Blob([JSON.stringify(latestReport,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='majal-network-report-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';a.click();URL.revokeObjectURL(url)});
